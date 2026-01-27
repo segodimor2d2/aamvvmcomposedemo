@@ -11,4 +11,14 @@ class MainViewModel : ViewModel() {
     fun changeMessage() {
         _message.value = "Mensagem alterada pelo ViewModel"
     }
+
+    private val _text = MutableStateFlow("")
+    val text = _text.asStateFlow()
+
+    fun onTextChange(newText: String) {
+        _text.value = newText
+    }
 }
+
+
+
