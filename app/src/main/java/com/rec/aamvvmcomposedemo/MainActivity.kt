@@ -31,6 +31,9 @@ class MainActivity : ComponentActivity() {
             val message by viewModel.message.collectAsState()
             val text by viewModel.text.collectAsState()
 
+            val validaText by viewModel.validaText.collectAsState()
+            val isValid by viewModel.isValid.collectAsState()
+
             AaMvvmComposeDemoTheme {
                 Scaffold(
                     modifier = Modifier.fillMaxSize()
@@ -61,17 +64,38 @@ class MainActivity : ComponentActivity() {
                         Text(text = "Você digitou:")
                         Text(text = text)
 
+
+                        Spacer(modifier = Modifier.padding(8.dp))
+                        TextField(
+                            value = validaText,
+                            onValueChange = { viewModel.onValidaTextChange(it) },
+                            label = { Text("Digite pelo menos 3 caracteres") }
+                        )
+
+                        Spacer(modifier = Modifier.padding(8.dp))
+                        Text(
+                            text = if (isValid) "Texto válido ✅" else "Texto inválido ❌"
+                        )
+
+
+
+
+
                         Spacer(modifier = Modifier.padding(8.dp))
                         Button(
                             onClick = { viewModel.apagaMessage() }
                         ) {
                             Text("reset")
                         }
+
                     }
                 }
             }
         }
     }
 }
+
+
+
 
 
