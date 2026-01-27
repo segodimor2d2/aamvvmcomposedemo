@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
@@ -34,10 +35,18 @@ class MainActivity : ComponentActivity() {
             val validaText by viewModel.validaText.collectAsState()
             val isValid by viewModel.isValid.collectAsState()
 
+            val email by viewModel.email.collectAsState()
+            val password by viewModel.password.collectAsState()
+            val isFormValid by viewModel.isFormValid.collectAsState()
+            val isLoading by viewModel.isLoading.collectAsState()
+            val loginResult by viewModel.loginResult.collectAsState()
+
+
             AaMvvmComposeDemoTheme {
                 Scaffold(
                     modifier = Modifier.fillMaxSize()
                 ) { innerPadding ->
+
                     Column(
                         modifier = Modifier
                         .padding(innerPadding)
@@ -77,15 +86,50 @@ class MainActivity : ComponentActivity() {
                             text = if (isValid) "Texto válido ✅" else "Texto inválido ❌"
                         )
 
-
-
-
-
                         Spacer(modifier = Modifier.padding(8.dp))
                         Button(
                             onClick = { viewModel.apagaMessage() }
                         ) {
                             Text("reset")
+                        }
+
+
+
+
+
+
+
+
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        TextField(
+                            value = email,
+                            onValueChange = { viewModel.onEmailChange(it) },
+                            label = { Text("Email") }
+                        )
+
+                        Spacer(modifier = Modifier.padding(8.dp))
+
+                        TextField(
+                            value = password,
+                            onValueChange = { viewModel.onPasswordChange(it) },
+                            label = { Text("Senha") }
+                        )
+
+                        Spacer(modifier = Modifier.padding(16.dp))
+
+                        Button(
+                            enabled = isFormValid && !isLoading,
+                            onClick = { viewModel.login() }
+                        ) {
+                            Text(if (isLoading) "Entrando..." else "Entrar")
+                        }
+
+                        Spacer(modifier = Modifier.padding(16.dp))
+
+                        if (loginResult != null) {
+                            Text(text = loginResult!!)
                         }
 
                     }
