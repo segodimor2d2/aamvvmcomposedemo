@@ -61,6 +61,12 @@ class MainActivity : ComponentActivity() {
                         Text(text = "Você digitou:")
                         Text(text = text)
 
+                        Spacer(modifier = Modifier.padding(8.dp))
+                        Button(
+                            onClick = { viewModel.apagaMessage() }
+                        ) {
+                            Text("reset")
+                        }
                     }
                 }
             }

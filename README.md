@@ -26,3 +26,11 @@ val message = state.value
 ======
 val message by viewModel.message.collectAsState()
 ```
+
+
+# 🧩 Regra de ouro que você acabou de aprender
+
+> **TextField não é dono do texto.
+> ViewModel é.**
+
+Se você entendeu isso, **entendeu Compose + MVVM**.
