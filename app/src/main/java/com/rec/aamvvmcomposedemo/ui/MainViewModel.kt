@@ -15,45 +15,44 @@ class MainViewModel : ViewModel() {
     private val _password = MutableStateFlow("")
     val password = _password.asStateFlow()
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading = _isLoading.asStateFlow()
+    private val _uiState = MutableStateFlow<LoginUiState>(LoginUiState.Idle)
+    val uiState = _uiState.asStateFlow()
 
-    private val _loginResult = MutableStateFlow<String?>(null)
-    val loginResult = _loginResult.asStateFlow()
+    val isFormValid: Boolean
+        get() = email.value.isNotBlank() && password.value.length >= 4
 
-    val isFormValid = MutableStateFlow(false)
-
-    fun onEmailChange(newEmail: String) {
-        _email.value = newEmail
-        validateForm()
+    fun onEmailChange(value: String) {
+        _email.value = value
     }
 
-    fun onPasswordChange(newPassword: String) {
-        _password.value = newPassword
-        validateForm()
-    }
-
-    private fun validateForm() {
-        isFormValid.value = _email.value.contains("@") && _password.value.length >= 6
+    fun onPasswordChange(value: String) {
+        _password.value = value
     }
 
     fun login() {
+        if (!isFormValid) {
+            _uiState.value = LoginUiState.Error("Email ou senha inválidos")
+            return
+        }
+
         viewModelScope.launch {
-            _isLoading.value = true
-            _loginResult.value = null
+            _uiState.value = LoginUiState.Loading
 
-            delay(2000) // simula chamada de rede
+            // simula chamada de rede
+            delay(2000)
 
-            _isLoading.value = false
-
-            if (_email.value == "tt@ee.com" &&
-                _password.value == "123456"
-            ) {
-                _loginResult.value = "Login realizado com sucesso ✅"
+            if (email.value == "tt@ee.com" && password.value == "qwer") {
+                _uiState.value = LoginUiState.Success("Login realizado com sucesso ✅")
             } else {
-                _loginResult.value = "Email ou senha inválidos ❌"
+                _uiState.value = LoginUiState.Error("Credenciais incorretas ❌")
             }
         }
+    }
+
+    fun reset() {
+        _email.value = ""
+        _password.value = ""
+        _uiState.value = LoginUiState.Idle
     }
 
 

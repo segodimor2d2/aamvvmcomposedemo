@@ -17,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.rec.aamvvmcomposedemo.ui.LoginUiState
 import com.rec.aamvvmcomposedemo.ui.MainViewModel
 import com.rec.aamvvmcomposedemo.ui.theme.AaMvvmComposeDemoTheme
 
@@ -31,11 +32,10 @@ class MainActivity : ComponentActivity() {
 
             val email by viewModel.email.collectAsState()
             val password by viewModel.password.collectAsState()
-            val isFormValid by viewModel.isFormValid.collectAsState()
-            val isLoading by viewModel.isLoading.collectAsState()
-            val loginResult by viewModel.loginResult.collectAsState()
+            val uiState by viewModel.uiState.collectAsState()
 
             AaMvvmComposeDemoTheme {
+
                 Scaffold(
                     modifier = Modifier.fillMaxSize()
                 ) { innerPadding ->
@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
 
                         TextField(
                             value = email,
-                            onValueChange = { viewModel.onEmailChange(it) },
+                            onValueChange = viewModel::onEmailChange,
                             label = { Text("Email") }
                         )
 
@@ -56,23 +56,43 @@ class MainActivity : ComponentActivity() {
 
                         TextField(
                             value = password,
-                            onValueChange = { viewModel.onPasswordChange(it) },
+                            onValueChange = viewModel::onPasswordChange,
                             label = { Text("Senha") }
                         )
 
                         Spacer(modifier = Modifier.padding(16.dp))
 
                         Button(
-                            enabled = isFormValid && !isLoading,
-                            onClick = { viewModel.login() }
+                            onClick = { viewModel.login() },
+                            enabled = uiState !is LoginUiState.Loading
                         ) {
-                            Text(if (isLoading) "Entrando..." else "Entrar")
+                            Text("Entrar")
                         }
 
                         Spacer(modifier = Modifier.padding(16.dp))
 
-                        if (loginResult != null) {
-                            Text(text = loginResult!!)
+                        when (uiState) {
+                            is LoginUiState.Idle -> {
+                                Text("Digite seus dados")
+                            }
+
+                            is LoginUiState.Loading -> {
+                                Text("Carregando...")
+                            }
+
+                            is LoginUiState.Success -> {
+                                Text((uiState as LoginUiState.Success).message)
+                            }
+
+                            is LoginUiState.Error -> {
+                                Text((uiState as LoginUiState.Error).message)
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.padding(16.dp))
+
+                        Button(onClick = { viewModel.reset() }) {
+                            Text("Reset")
                         }
 
                     }
