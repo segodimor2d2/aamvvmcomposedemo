@@ -8,42 +8,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
-    private val _message = MutableStateFlow("Mensagem inicial")
-    val message = _message.asStateFlow()
-
-    private val _text = MutableStateFlow("")
-    val text = _text.asStateFlow()
-
-    private val _validaText = MutableStateFlow("")
-    val validaText = _validaText.asStateFlow()
-
-    private val _isValid = MutableStateFlow(false)
-    val isValid = _isValid.asStateFlow()
-
-
-    fun changeMessage() {
-        _message.value = "Mensagem alterada pelo ViewModel"
-    }
-
-    fun onTextChange(newText: String) {
-        _text.value = newText
-    }
-
-    fun apagaMessage() {
-        _message.value = ""
-        _text.value = ""
-        _validaText.value = ""
-    }
-
-    fun onValidaTextChange(newText: String) {
-        _validaText.value = newText
-        _isValid.value = newText.length >= 3
-    }
-
-
-
-
-
 
     private val _email = MutableStateFlow("")
     val email = _email.asStateFlow()
@@ -70,8 +34,7 @@ class MainViewModel : ViewModel() {
     }
 
     private fun validateForm() {
-        isFormValid.value =
-            _email.value.contains("@") && _password.value.length >= 6
+        isFormValid.value = _email.value.contains("@") && _password.value.length >= 6
     }
 
     fun login() {
@@ -83,7 +46,7 @@ class MainViewModel : ViewModel() {
 
             _isLoading.value = false
 
-            if (_email.value == "teste@email.com" &&
+            if (_email.value == "tt@ee.com" &&
                 _password.value == "123456"
             ) {
                 _loginResult.value = "Login realizado com sucesso ✅"

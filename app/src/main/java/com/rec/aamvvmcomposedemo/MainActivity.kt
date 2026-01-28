@@ -7,7 +7,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
@@ -29,18 +28,12 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             val viewModel: MainViewModel = viewModel()
-            val message by viewModel.message.collectAsState()
-            val text by viewModel.text.collectAsState()
-
-            val validaText by viewModel.validaText.collectAsState()
-            val isValid by viewModel.isValid.collectAsState()
 
             val email by viewModel.email.collectAsState()
             val password by viewModel.password.collectAsState()
             val isFormValid by viewModel.isFormValid.collectAsState()
             val isLoading by viewModel.isLoading.collectAsState()
             val loginResult by viewModel.loginResult.collectAsState()
-
 
             AaMvvmComposeDemoTheme {
                 Scaffold(
@@ -52,56 +45,6 @@ class MainActivity : ComponentActivity() {
                         .padding(innerPadding)
                         .padding(16.dp)
                     ) {
-                        Text(text = message)
-
-                        Button(
-                            onClick = { viewModel.changeMessage() }
-                        ) {
-                            Text("Alterar mensagem")
-                        }
-
-                        Spacer(modifier = Modifier.padding(8.dp))
-
-                        TextField(
-                            value = text,
-                            onValueChange = { newValue -> viewModel.onTextChange(newValue) },
-                            label = { Text("Digite algo") }
-                        )
-
-                        Spacer(modifier = Modifier.padding(8.dp))
-
-                        Text(text = "Você digitou:")
-                        Text(text = text)
-
-
-                        Spacer(modifier = Modifier.padding(8.dp))
-                        TextField(
-                            value = validaText,
-                            onValueChange = { viewModel.onValidaTextChange(it) },
-                            label = { Text("Digite pelo menos 3 caracteres") }
-                        )
-
-                        Spacer(modifier = Modifier.padding(8.dp))
-                        Text(
-                            text = if (isValid) "Texto válido ✅" else "Texto inválido ❌"
-                        )
-
-                        Spacer(modifier = Modifier.padding(8.dp))
-                        Button(
-                            onClick = { viewModel.apagaMessage() }
-                        ) {
-                            Text("reset")
-                        }
-
-
-
-
-
-
-
-
-
-                        Spacer(modifier = Modifier.height(24.dp))
 
                         TextField(
                             value = email,
