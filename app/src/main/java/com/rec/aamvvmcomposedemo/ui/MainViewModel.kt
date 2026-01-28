@@ -9,29 +9,44 @@ import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
 
-    private val _email = MutableStateFlow("")
-    val email = _email.asStateFlow()
+    private var email = ""
+    private var password = ""
 
-    private val _password = MutableStateFlow("")
-    val password = _password.asStateFlow()
+    private val _uiState =
+        MutableStateFlow<LoginUiState>(
+            LoginUiState.Editing(
+                email = "",
+                password = "",
+                isFormValid = false
+            )
+        )
 
-    private val _uiState = MutableStateFlow<LoginUiState>(LoginUiState.Idle)
     val uiState = _uiState.asStateFlow()
 
-    val isFormValid: Boolean
-        get() = email.value.isNotBlank() && password.value.length >= 4
-
     fun onEmailChange(value: String) {
-        _email.value = value
+        email = value
+        emitEditing()
     }
 
     fun onPasswordChange(value: String) {
-        _password.value = value
+        password = value
+        emitEditing()
+    }
+
+    private fun emitEditing() {
+        _uiState.value = LoginUiState.Editing(
+            email = email,
+            password = password,
+            isFormValid = email.isNotBlank() && password.length >= 4
+        )
     }
 
     fun login() {
-        if (!isFormValid) {
-            _uiState.value = LoginUiState.Error("Email ou senha inválidos")
+        val state = _uiState.value
+
+        if (state !is LoginUiState.Editing || !state.isFormValid) {
+            _uiState.value =
+                LoginUiState.Error("Email ou senha inválidos")
             return
         }
 
@@ -41,20 +56,20 @@ class MainViewModel : ViewModel() {
             // simula chamada de rede
             delay(2000)
 
-            if (email.value == "tt@ee.com" && password.value == "qwer") {
-                _uiState.value = LoginUiState.Success("Login realizado com sucesso ✅")
+            if (email == "tt@ee.com" && password == "qwer") {
+                _uiState.value =
+                    LoginUiState.Success("Login realizado com sucesso ✅")
             } else {
-                _uiState.value = LoginUiState.Error("Credenciais incorretas ❌")
+                _uiState.value =
+                    LoginUiState.Error("Credenciais incorretas ❌")
             }
         }
     }
 
     fun reset() {
-        _email.value = ""
-        _password.value = ""
-        _uiState.value = LoginUiState.Idle
-    }
-
+        email = ""
+        password = ""
+        emitEditing()
 
 }
 

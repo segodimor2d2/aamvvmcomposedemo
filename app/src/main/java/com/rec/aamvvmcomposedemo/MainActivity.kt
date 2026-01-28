@@ -21,88 +21,89 @@ import com.rec.aamvvmcomposedemo.ui.LoginUiState
 import com.rec.aamvvmcomposedemo.ui.MainViewModel
 import com.rec.aamvvmcomposedemo.ui.theme.AaMvvmComposeDemoTheme
 
-
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
 
             val viewModel: MainViewModel = viewModel()
-
-            val email by viewModel.email.collectAsState()
-            val password by viewModel.password.collectAsState()
             val uiState by viewModel.uiState.collectAsState()
 
             AaMvvmComposeDemoTheme {
-
                 Scaffold(
                     modifier = Modifier.fillMaxSize()
                 ) { innerPadding ->
 
                     Column(
                         modifier = Modifier
-                        .padding(innerPadding)
-                        .padding(16.dp)
+                            .padding(innerPadding)
+                            .padding(16.dp)
                     ) {
 
-                        TextField(
-                            value = email,
-                            onValueChange = viewModel::onEmailChange,
-                            label = { Text("Email") }
-                        )
-
-                        Spacer(modifier = Modifier.padding(8.dp))
-
-                        TextField(
-                            value = password,
-                            onValueChange = viewModel::onPasswordChange,
-                            label = { Text("Senha") }
-                        )
-
-                        Spacer(modifier = Modifier.padding(16.dp))
-
-                        Button(
-                            onClick = { viewModel.login() },
-                            enabled = uiState !is LoginUiState.Loading
-                        ) {
-                            Text("Entrar")
-                        }
-
-                        Spacer(modifier = Modifier.padding(16.dp))
-
                         when (uiState) {
-                            is LoginUiState.Idle -> {
-                                Text("Digite seus dados")
+
+                            is LoginUiState.Editing -> {
+                                val state =
+                                    uiState as LoginUiState.Editing
+
+                                TextField(
+                                    value = state.email,
+                                    onValueChange = viewModel::onEmailChange,
+                                    label = { Text("Email") }
+                                )
+
+                                Spacer(Modifier.padding(8.dp))
+
+                                TextField(
+                                    value = state.password,
+                                    onValueChange = viewModel::onPasswordChange,
+                                    label = { Text("Senha") }
+                                )
+
+                                Spacer(Modifier.padding(16.dp))
+
+                                Button(
+                                    enabled = state.isFormValid,
+                                    onClick = viewModel::login
+                                ) {
+                                    Text("Entrar")
+                                }
                             }
 
-                            is LoginUiState.Loading -> {
+                            LoginUiState.Loading -> {
                                 Text("Carregando...")
                             }
 
                             is LoginUiState.Success -> {
-                                Text((uiState as LoginUiState.Success).message)
+                                Text(
+                                    (uiState as LoginUiState.Success).message
+                                )
+
+                                Spacer(Modifier.padding(16.dp))
+
+                                Button(onClick = viewModel::reset) {
+                                    Text("Reset")
+                                }
                             }
 
                             is LoginUiState.Error -> {
-                                Text((uiState as LoginUiState.Error).message)
+                                Text(
+                                    (uiState as LoginUiState.Error).message
+                                )
+
+                                Spacer(Modifier.padding(16.dp))
+
+                                Button(onClick = viewModel::reset) {
+                                    Text("Tentar novamente")
+                                }
                             }
                         }
-
-                        Spacer(modifier = Modifier.padding(16.dp))
-
-                        Button(onClick = { viewModel.reset() }) {
-                            Text("Reset")
-                        }
-
                     }
                 }
             }
         }
     }
 }
-
-
-
-
-
