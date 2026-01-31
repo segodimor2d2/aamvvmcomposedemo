@@ -29,8 +29,9 @@ class MainActivity : ComponentActivity() {
 
         setContent {
 
+
             val viewModel: MainViewModel = viewModel()
-            val uiState by viewModel.uiState.collectAsState()
+            val post by viewModel.post.collectAsState()
 
             AaMvvmComposeDemoTheme {
                 Scaffold(
@@ -43,64 +44,23 @@ class MainActivity : ComponentActivity() {
                             .padding(16.dp)
                     ) {
 
-                        when (uiState) {
 
-                            is LoginUiState.Editing -> {
-                                val state =
-                                    uiState as LoginUiState.Editing
-
-                                TextField(
-                                    value = state.email,
-                                    onValueChange = viewModel::onEmailChange,
-                                    label = { Text("Email") }
-                                )
-
-                                Spacer(Modifier.padding(8.dp))
-
-                                TextField(
-                                    value = state.password,
-                                    onValueChange = viewModel::onPasswordChange,
-                                    label = { Text("Senha") }
-                                )
-
-                                Spacer(Modifier.padding(16.dp))
-
-                                Button(
-                                    enabled = state.isFormValid,
-                                    onClick = viewModel::login
-                                ) {
-                                    Text("Entrar")
-                                }
-                            }
-
-                            LoginUiState.Loading -> {
-                                Text("Carregando...")
-                            }
-
-                            is LoginUiState.Success -> {
-                                Text(
-                                    (uiState as LoginUiState.Success).message
-                                )
-
-                                Spacer(Modifier.padding(16.dp))
-
-                                Button(onClick = viewModel::reset) {
-                                    Text("Reset")
-                                }
-                            }
-
-                            is LoginUiState.Error -> {
-                                Text(
-                                    (uiState as LoginUiState.Error).message
-                                )
-
-                                Spacer(Modifier.padding(16.dp))
-
-                                Button(onClick = viewModel::reset) {
-                                    Text("Tentar novamente")
-                                }
-                            }
+                        Button(
+                            onClick = { viewModel.loadPost() }
+                        ) {
+                            Text("Carregar Post")
                         }
+
+                        Spacer(Modifier.padding(16.dp))
+
+                        if (post == null) {
+                            Text("Nenhum dado carregado")
+                        } else {
+                            Text(text = post!!.title)
+                            Spacer(Modifier.padding(8.dp))
+                            Text(text = post!!.body)
+                        }
+
                     }
                 }
             }
