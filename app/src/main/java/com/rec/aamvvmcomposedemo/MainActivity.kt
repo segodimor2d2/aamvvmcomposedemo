@@ -11,13 +11,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.rec.aamvvmcomposedemo.ui.LoginUiState
 import com.rec.aamvvmcomposedemo.ui.MainViewModel
 import com.rec.aamvvmcomposedemo.ui.theme.AaMvvmComposeDemoTheme
 
@@ -31,7 +29,7 @@ class MainActivity : ComponentActivity() {
 
 
             val viewModel: MainViewModel = viewModel()
-            val post by viewModel.post.collectAsState()
+            val ledState by viewModel.ledState.collectAsState()
 
             AaMvvmComposeDemoTheme {
                 Scaffold(
@@ -44,21 +42,24 @@ class MainActivity : ComponentActivity() {
                             .padding(16.dp)
                     ) {
 
-
                         Button(
-                            onClick = { viewModel.loadPost() }
+                            onClick = {
+                                android.util.Log.d("UI", "Botão R pressionado")
+                                viewModel.setLed(100)
+                            }
                         ) {
-                            Text("Carregar Post")
+                            Text("LED R")
                         }
+
+
 
                         Spacer(Modifier.padding(16.dp))
 
-                        if (post == null) {
-                            Text("Nenhum dado carregado")
+                        if (ledState == null) {
+                            Text("Nenhum dado enviado")
                         } else {
-                            Text(text = post!!.title)
-                            Spacer(Modifier.padding(8.dp))
-                            Text(text = post!!.body)
+                            Text("Percent: ${ledState!!.percent}")
+                            Text("Duty: ${ledState!!.duty}")
                         }
 
                     }
