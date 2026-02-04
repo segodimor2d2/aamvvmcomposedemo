@@ -14,22 +14,21 @@ class MainViewModel : ViewModel() {
     private val _ledState = MutableStateFlow<LedResponse?>(null)
     val ledState = _ledState.asStateFlow()
 
-    fun setLed(percent: Int) {
-        android.util.Log.d("VM", "loadPost() chamado")
+    fun setLed(ledId: Int, percent: Int) {
         viewModelScope.launch {
             try {
-                android.util.Log.d("VM", "Antes da chamada HTTP")
                 val response = RetrofitInstance.api.setLed(
-                    id = 1,
+                    id = ledId,
                     request = LedRequest(percent)
                 )
-                android.util.Log.d("VM", "Resposta recebida: $response")
                 _ledState.value = response
             } catch (e: Exception) {
+                android.util.Log.e("VM", "Erro na chamada", e)
                 e.printStackTrace()
             }
         }
     }
+
 }
 
 

@@ -8,11 +8,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -30,6 +33,7 @@ class MainActivity : ComponentActivity() {
 
             val viewModel: MainViewModel = viewModel()
             val ledState by viewModel.ledState.collectAsState()
+            var isOn by remember { mutableStateOf(false) }
 
             AaMvvmComposeDemoTheme {
                 Scaffold(
@@ -42,16 +46,16 @@ class MainActivity : ComponentActivity() {
                             .padding(16.dp)
                     ) {
 
-                        Button(
-                            onClick = {
-                                android.util.Log.d("UI", "Botão R pressionado")
-                                viewModel.setLed(100)
+                        Switch(
+                            checked = isOn,
+                            onCheckedChange = { checked ->
+                                isOn = checked
+                                viewModel.setLed(
+                                    ledId = 2,
+                                    percent = if (checked) 100 else 0
+                                )
                             }
-                        ) {
-                            Text("LED R")
-                        }
-
-
+                        )
 
                         Spacer(Modifier.padding(16.dp))
 
