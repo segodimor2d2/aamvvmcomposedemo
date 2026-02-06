@@ -10,37 +10,42 @@ import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
 
-    private val _uiState = MutableStateFlow<LedUiState>(LedUiState.Idle)
+    private val _uiState = MutableStateFlow<RgbUiState>(RgbUiState.Loading)
     val uiState = _uiState.asStateFlow()
 
+    init {
+        loadInitialState()
+    }
 
-    fun setLed(ledId: Int, percent: Int) {
-
-        _uiState.value = LedUiState.Loading(
-            ledId = ledId,
-            targetPercent = percent
-        )
-
+    private fun loadInitialState() {
         viewModelScope.launch {
             try {
-                val response = RetrofitInstance.api.setLed(
-                    id = ledId,
-                    request = LedRequest(percent)
-                )
+                val r = RetrofitInstance.api.getLed(1).percent
+                val g = RetrofitInstance.api.getLed(2).percent
+                val b = RetrofitInstance.api.getLed(3).percent
 
-                _uiState.value = LedUiState.Success(
-                    ledId = ledId,
-                    percent = response.percent,
-                    duty = response.duty
-                )
+                _uiState.value = RgbUiState.Ready(r, g, b)
 
             } catch (e: Exception) {
-                _uiState.value = LedUiState.Error(
-                    message = "Erro ao controlar LED $ledId"
-                )
+                _uiState.value = RgbUiState.Error("Erro ao carregar estado inicial")
             }
         }
+    }
 
+    fun updateRgb(r: Int, g: Int, b: Int) {
+        _uiState.value = RgbUiState.Ready(r, g, b)
+    }
+
+    fun commitRgb(r: Int, g: Int, b: Int) {
+        viewModelScope.launch {
+            try {
+                RetrofitInstance.api.setLed(1, LedRequest(r))
+                RetrofitInstance.api.setLed(2, LedRequest(g))
+                RetrofitInstance.api.setLed(3, LedRequest(b))
+            } catch (e: Exception) {
+                _uiState.value = RgbUiState.Error("Erro ao enviar valores RGB")
+            }
+        }
     }
 
 }

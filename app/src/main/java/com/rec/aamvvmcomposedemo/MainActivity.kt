@@ -4,23 +4,23 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.rec.aamvvmcomposedemo.ui.LedUiState
 import com.rec.aamvvmcomposedemo.ui.MainViewModel
+import com.rec.aamvvmcomposedemo.ui.RgbUiState
 import com.rec.aamvvmcomposedemo.ui.theme.AaMvvmComposeDemoTheme
 
 class MainActivity : ComponentActivity() {
@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
                     Column(
                         modifier = Modifier
                             .padding(innerPadding)
-                            .padding(16.dp)
+                            .padding(24.dp, 16.dp)
                     ) {
                         LedControls()
                     }
@@ -52,68 +52,70 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
 @Composable
 fun LedControls(viewModel: MainViewModel = viewModel()) {
 
     val uiState by viewModel.uiState.collectAsState()
 
-    Column(modifier = Modifier.padding(16.dp)) {
+    when (uiState) {
 
-        LedRow(ledId = 1, uiState, viewModel)
-        LedRow(ledId = 2, uiState, viewModel)
-        LedRow(ledId = 3, uiState, viewModel)
-
-        Spacer(Modifier.padding(16.dp))
-
-        when (uiState) {
-            is LedUiState.Loading -> {
-                val state = uiState as LedUiState.Loading
-                Text("Atualizando LED ${state.ledId}...")
-            }
-
-            is LedUiState.Success -> {
-                val state = uiState as LedUiState.Success
-                Text("LED ${state.ledId} → ${state.percent}% (duty ${state.duty})")
-            }
-
-            is LedUiState.Error -> {
-                Text((uiState as LedUiState.Error).message)
-            }
-
-            LedUiState.Idle -> {
-                Text("Pronto")
-            }
-        }
-    }
-}
-
-
-@Composable
-fun LedRow(
-    ledId: Int,
-    uiState: LedUiState,
-    viewModel: MainViewModel
-) {
-    Row(
-        modifier = Modifier.padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-
-        Text("LED $ledId")
-
-        Button(
-            onClick = { viewModel.setLed(ledId, 100) },
-            enabled = uiState !is LedUiState.Loading
-        ) {
-            Text("ON")
+        RgbUiState.Loading -> {
+            Text("Carregando LEDs...")
         }
 
-        Button(
-            onClick = { viewModel.setLed(ledId, 0) },
-            enabled = uiState !is LedUiState.Loading
-        ) {
-            Text("OFF")
+        is RgbUiState.Error -> {
+            Text((uiState as RgbUiState.Error).message)
+        }
+
+        is RgbUiState.Ready -> {
+
+            val state = uiState as RgbUiState.Ready
+
+            var r by remember { mutableStateOf(state.r.toFloat()) }
+            var g by remember { mutableStateOf(state.g.toFloat()) }
+            var b by remember { mutableStateOf(state.b.toFloat()) }
+
+            Column {
+
+                Text("Red: ${r.toInt()}")
+                Slider(
+                    value = r,
+                    onValueChange = {
+                        r = it
+                        viewModel.updateRgb(r.toInt(), g.toInt(), b.toInt())
+                    },
+                    onValueChangeFinished = {
+                        viewModel.commitRgb(r.toInt(), g.toInt(), b.toInt())
+                    },
+                    valueRange = 0f..100f
+                )
+
+                Text("Green: ${g.toInt()}")
+                Slider(
+                    value = g,
+                    onValueChange = {
+                        g = it
+                        viewModel.updateRgb(r.toInt(), g.toInt(), b.toInt())
+                    },
+                    onValueChangeFinished = {
+                        viewModel.commitRgb(r.toInt(), g.toInt(), b.toInt())
+                    },
+                    valueRange = 0f..100f
+                )
+
+                Text("Blue: ${b.toInt()}")
+                Slider(
+                    value = b,
+                    onValueChange = {
+                        b = it
+                        viewModel.updateRgb(r.toInt(), g.toInt(), b.toInt())
+                    },
+                    onValueChangeFinished = {
+                        viewModel.commitRgb(r.toInt(), g.toInt(), b.toInt())
+                    },
+                    valueRange = 0f..100f
+                )
+            }
         }
     }
 }
